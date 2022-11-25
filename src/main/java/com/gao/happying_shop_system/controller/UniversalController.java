@@ -66,7 +66,7 @@ public class UniversalController {
     public void download(@RequestParam("name") String fileName, HttpServletResponse response) throws FileNotFoundException {
         try {
             //输入流，通过输入流读取文件内容
-            FileInputStream fileInputStream = new FileInputStream(new File(basePath + fileName));
+            FileInputStream fileInputStream = new FileInputStream(basePath + fileName);
 
             //输出流，将文件写回浏览器响应体，响应给浏览器展示
             ServletOutputStream outputStream = response.getOutputStream();
