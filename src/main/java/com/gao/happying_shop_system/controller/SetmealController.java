@@ -3,17 +3,13 @@ package com.gao.happying_shop_system.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gao.happying_shop_system.dto.DishDto;
-import com.gao.happying_shop_system.entity.Dish;
-import com.gao.happying_shop_system.entity.DishFlavor;
 import com.gao.happying_shop_system.entity.SetmealDish;
-import com.gao.happying_shop_system.service.IDishService;
 import com.gao.happying_shop_system.utils.R;
 import com.gao.happying_shop_system.dto.SetmealDto;
 import com.gao.happying_shop_system.entity.Setmeal;
 import com.gao.happying_shop_system.service.ISetmealDishService;
 import com.gao.happying_shop_system.service.ISetmealService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,15 +28,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/happying_shop_system/setmeal")
 public class SetmealController {
-
     @Autowired
     private ISetmealService setmealService;
 
     @Autowired
-    private IDishService dishService;
-
-    @Autowired
-    private ISetmealDishService setmealDishService;
+    private ISetmealDishService SetmealDishService;
 
     /**
      * @description: 新增套餐
@@ -102,21 +94,18 @@ public class SetmealController {
         return R.success(list);
     }
     @GetMapping("/dish/{id}")
-    public R<List<DishDto>> dish(@PathVariable("id") Long setmealId){
+    public R<List<DishDto>> dish(@PathVariable("id") Long SetmealId){
         LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SetmealDish::getSetmealId,setmealId);
+        queryWrapper.eq(SetmealDish::getSetmealId,SetmealId);
         //获取套餐里面的所有菜品，这个就是SetmealDish表里面的数据
         List<SetmealDish> setmealDishList = setmealDishService.list(queryWrapper);
         List<DishDto> dishDtoList = setmealDishList.stream().map((setmealDish -> {
             DishDto dishDto = new DishDto();
             //其实这个BeanUtils的拷贝是浅拷贝
             BeanUtils.copyProperties(setmealDish, dishDto);
-            //这里是为了把套餐中的菜品的基本信息填充到dto中，比如菜品描述，菜品的基本信息
+            //这里是为了把套餐中的菜品的基本信息填充到dto中，比如菜品描述，菜品图片等菜品的基本信息
             Long dishId = setmealDish.getDishId();
-            List<DishFlavor> flavors = dishService.getByIdWithDishAndFlavor(dishId).getFlavors();
-            dishDto.setFlavors(flavors);
             Dish dish = dishService.getById(dishId);
-            //这里是为了把套餐中的菜品的详细信息填充到dto中，比如菜品描述，菜品的基本信息
             BeanUtils.copyProperties(dish, dishDto);
             return dishDto;
         })).collect(Collectors.toList());
