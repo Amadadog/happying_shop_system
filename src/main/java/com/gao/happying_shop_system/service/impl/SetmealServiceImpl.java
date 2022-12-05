@@ -76,7 +76,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
                 BeanUtils.copyProperties(setmeal,setmealDto);
 
                 String categoryName =  category.getName();
-
+                int[] arr[] = new int[2][2];
                 setmealDto.setCategoryName(categoryName);
             }
             return setmealDto;

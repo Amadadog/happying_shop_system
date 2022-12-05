@@ -116,7 +116,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             Page<OrdersDto> ordersDtoPage= new Page<>();
         try{
             LambdaQueryWrapper<Orders> ordersLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            ordersLambdaQueryWrapper.eq( number != null ,Orders::getNumber,number)
+            ordersLambdaQueryWrapper.like( number != null ,Orders::getNumber,number)
                     .ge(beginTime != null,Orders::getOrderTime,beginTime)
                     .le(endTime != null,Orders::getOrderTime,endTime);
             ordersLambdaQueryWrapper.orderByDesc(Orders::getOrderTime);
