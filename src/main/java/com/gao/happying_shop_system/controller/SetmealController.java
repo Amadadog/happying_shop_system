@@ -3,13 +3,16 @@ package com.gao.happying_shop_system.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gao.happying_shop_system.dto.DishDto;
+import com.gao.happying_shop_system.entity.Dish;
 import com.gao.happying_shop_system.entity.SetmealDish;
+import com.gao.happying_shop_system.service.IDishService;
 import com.gao.happying_shop_system.utils.R;
 import com.gao.happying_shop_system.dto.SetmealDto;
 import com.gao.happying_shop_system.entity.Setmeal;
 import com.gao.happying_shop_system.service.ISetmealDishService;
 import com.gao.happying_shop_system.service.ISetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +35,10 @@ public class SetmealController {
     private ISetmealService setmealService;
 
     @Autowired
-    private ISetmealDishService SetmealDishService;
+    private ISetmealDishService setmealDishService;
+
+    @Autowired
+    private IDishService dishService;
 
     /**
      * @description: 新增套餐
