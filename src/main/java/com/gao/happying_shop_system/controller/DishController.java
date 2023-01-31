@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/happying_shop_system/dish")
+@CrossOrigin(origins = "http://localhost:8080", allowedHeaders = "*")
 public class DishController {
     @Autowired
     private IDishService dishService;
