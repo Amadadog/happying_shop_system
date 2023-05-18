@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=no,minimal-ui">
+    <title>开心商铺</title>
+    <link rel="icon" href="../images/favico.ico">
+    <!--不同屏幕尺寸根字体设置-->
+    <script src="../js/base.js"></script>
+    <!--element-ui的样式-->
+    <link rel="stylesheet" href="../../backend/plugins/element-ui/index.css"/>
+    <!--引入vant样式-->
+    <link rel="stylesheet" href="../styles/vant.min.css"/>
+    <!-- 引入样式  -->
+    <link rel="stylesheet" href="../styles/index.css"/>
+    <!--本页面内容的样式-->
+    <link rel="stylesheet" href="../styles/login.css"/>
+</head>
+<body>
+<div id="login" v-loading="loading">
+    <div class="divHead">注册</div>
+    <div class="register_container">
+        <el-input placeholder=" 请输入邮箱号" v-model="form.email" maxlength='20' weight=""/>
+        </el-input>
+        <el-input type="password" placeholder=" 请输入密码" v-model="form.password1" maxlength='20'/>
+        </el-input>
+        <el-input type="password" placeholder=" 请确认密码" v-model="form.password2" maxlength='20'/>
+        </el-input>
+        <el-input placeholder=" 请输入验证码" v-model="form.code" maxlength='20'/>
+        </el-input>
+        <div class="span-container">
+
+            <span @click='getCode'>获取验证码</span>
+            <span @click='goToLogin'>已有账号？去登录</span>
+        </div>
+
+        <div class="divMsg" v-if="msgFlag">邮箱号输入不正确，请重新输入</div>
+    </div>
+
+
+    <el-button type="primary" :class="{btnSubmit:1===1,btnNoPhone:!form.email,btnPhone:form.email}"
+               @click="btnRegister">注册
+    </el-button>
+    <!--    <el-button :plain="true" @click="open2">成功</el-button>-->
+</div>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="../../backend/plugins/vue/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="../../backend/plugins/element-ui/index.js"></script>
+<!-- 引入vant样式 -->
+<script src="../js/vant.min.js"></script>
+<!-- 引入axios -->
+<script src="../../backend/plugins/axios/axios.min.js"></script>
+<script src="../js/request.js"></script>
+<script src="../api/login_register.js"></script>
+</body>
+<script>
+    new Vue({
+        el: "#login",
+        data() {
+            return {
+                form: {
+                    email: '',
+                    password1: '',
+                    password2: '',
+                    code: '',
+                },
+                msgFlag: false,
+                loading: false
+            }
+        },
+        computed: {},
+        created() {
+        },
+        mounted() {
+        },
+        methods: {
+            open2() {
+                this.$message({
+                    message: '恭喜你，这是一条成功消息',
+                    type: 'success'
+                });
+            },
+            goToLogin() {
+                window.requestAnimationFrame(() => {
+                    window.location.href = './login.html'
+                })
+            },
+            getCode() {
+                this.form.password = ''
+                const regex = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                if (regex.test(this.form.email)) {
+                    this.msgFlag = false
+                    sendMailCodeApi({email: this.form.email})
+                    this.$message({
+                        message: '请求成功',
+                        type: 'success'
+                    });
+                } else {
+                    this.msgFlag = true
+                }
+            },
+            async btnRegister() {
+                const self = this
+                const regex = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                if (!regex.test(this.form.email)) {
+                    this.$message({
+                        message: '请输入正确的邮箱号',
+                        type: 'error'
+                    });
+                } else if (this.form.code == null || this.form.code.length == 0 || this.form.code.length != 6) {
+                    this.$message({
+                        message: '请输入6位验证码',
+                        type: 'error'
+                    });
+                    this.form.code = '';
+                } else if (this.form.password1 != this.form.password2) {
+                    this.$message({
+                        message: '两次密码不一致',
+                        type: 'error'
+                    });
+                    this.form.password1 = '';
+                    this.form.password2 = '';
+                } else if (this.form.password1.length < 6 || this.form.password2.length < 6) {
+                    this.$message({
+                        message: '请输入6位以上的密码',
+                        type: 'error'
+                    });
+                    this.form.password1 = '';
+                    this.form.password2 = '';
+                } else if (this.form.email) {
+                    this.loading = true
+                    const res = await registerApi({
+                        email: this.form.email,
+                        password: this.form.password2,
+                        code: this.form.code
+                    })
+                    this.loading = false
+                    if (res.code === 1) {
+                        self.$message({
+                            message: '注册成功',
+                            type: 'success'
+                        });
+                        sessionStorage.setItem("userEmail", this.form.email)
+                        window.requestAnimationFrame(() => {
+                            window.location.href = './login.html'
+                        })
+                    } else {
+                        this.$notify({type: 'warning', message: res.msg});
+                    }
+                } else {
+                    this.$notify({type: 'warning', message: '请输入正确的内容'});
+                }
+            }
+        }
+    })
+</script>
+<style>
+    .register_container {
+        width: 357rem;
+        height: 300rem;
+        opacity: 1;
+        background: #ffffff;
+        border-radius: 6rem;
+        margin: 0 auto;
+        margin-top: 10rem;
+        position: relative;
+    }
+    .span-container{
+        display: flex;
+        justify-content: space-between;
+        color: #ffbc58;
+        padding-top: 15px;
+    }
+    .register_container input {
+        border: 0;
+        height: 63rem;
+    }
+
+    .register_container span {
+        padding: 6px 22px;
+        cursor: pointer;
+        opacity: 1;
+        font-size: 12rem;
+        font-family: PingFangSC, PingFangSC-Regular;
+        font-weight: 400;
+        text-align: left;
+        color: #ffc200;
+        letter-spacing: 0px;
+    }
+</style>
+</html>

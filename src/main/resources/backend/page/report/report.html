@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My HTML Page</title>
+    <!-- 引入ECharts库 -->
+
+    <link rel="stylesheet" type="text/css" href="myStyle.css">
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/c/font_3450690_e11c0x81its.css">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../plugins/element-ui/index.css"/>
+    <link rel="stylesheet" href="../../styles/common.css"/>
+    <link rel="stylesheet" href="../../styles/page.css"/>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+
+    <!-- 引入组件库 -->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.1/dist/echarts.min.js"></script>
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/statistics.js"></script>
+</head>
+<body>
+<div id="app">
+    <div style="height: 10%;">
+        <div class="title-index">
+            <div class="month">
+                <ul class="tabs">
+                    <li
+                            class="li-tab"
+                            v-for="(item, index) in tabsParam"
+                            :class="{ active: index === nowIndex }"
+                            :key="index"
+                            @click="activeIndex(index)"
+                    >
+                        {{ item }}
+                        <span></span>
+                    </li>
+                </ul>
+            </div>
+            <div class="get-time">
+                <p>
+                    已选时间：{{ dateData[0] }} 至 {{ dateData[1] }}
+                </p>
+            </div>
+            <el-button type="primary" @click="open1">导出数据<i class="iconfont icon-daochu"></i></el-button>
+
+        </div>
+    </div>
+    <div style="height: 20%;">
+        <div class="card-container">
+            <div class="card">
+                <div class="card-header">接口访问量</div>
+                <div class="card-body">
+                    <p>{{visits}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">累积销售金额</div>
+                <div class="card-body">
+                    <p>{{money}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">新增用户</div>
+                <div class="card-body">
+                    <p>{{users}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">商品销量</div>
+                <div class="card-body">
+                    <p>{{dishSales}}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">套餐销量</div>
+                <div class="card-body">
+                    <p>{{setmealSales}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; height: 100vh;">
+        <div style="flex-basis:100%; height: 400px; display: flex; justify-content: center;">
+            <div id="myChart" style="height: 100%; width: 100%;"></div>
+        </div>
+        <div style="flex-basis: 48%; height: 400px; display: flex; justify-content: center;">
+            <div id="myChart1" style="height: 100%; width: 100%;"></div>
+        </div>
+        <div style="flex-basis: 48%; height: 400px; display: flex; justify-content: center;">
+            <div id="main1" style="height: 100%; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="../../plugins/vue/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="../../plugins/element-ui/index.js"></script>
+<!-- 引入axios -->
+<script src="../../plugins/axios/axios.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        mounted() {
+            this.activeIndex(1);
+        },
+        data: {
+            nowIndex: 0,
+            value: [],
+            tabsParam: ['昨日', '近7日', '近30日', '本周', '本月'],
+            dateData: [],
+            setmealSalesList: [],
+            setmealSales: 0,
+            dishSalesList: [],
+            dishSales: 0,
+            visits: '',
+            money: 0,
+            moneyList: [],
+            users: 0,
+            moneyDayList: [],
+            top10Data: {
+                nameList: [],
+                numberList: [],
+            },
+            registerDayList: [],
+            registerList: [],
+            allRegisterList: [],
+
+        },
+        methods: {
+            open1() {
+                this.$message({
+                    message: '导出成功',
+                    type: 'success'
+                });
+            },
+            async init() {
+                this.money = 0;
+                this.setmealSales = 0;
+                this.dishSales = 0;
+                getStatisticsSetmealSales({
+                    beginTime: this.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: this.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    if (res.code == 1) {
+                        this.setmealSalesList = res.data || [];
+                        for (var i = 0; i < this.setmealSalesList.length; i++) {
+                            this.setmealSales += this.setmealSalesList[i].setmealSales;
+                        }
+                        // console.log(this.setmealSalesList)
+                    }
+                }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                });
+                getStatisticsDishSales({
+                    beginTime: this.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: this.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    if (res.code == 1) {
+                        this.dishSalesList = res.data || [];
+                        for (var i = 0; i < this.dishSalesList.length; i++) {
+                            this.dishSales += this.dishSalesList[i].dishSales;
+                        }
+                        // console.log(this.dishSalesList)
+                    }
+                }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                });
+                getVisits({
+                    beginTime: this.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: this.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    if (res.code == 1) {
+                        this.visits = res.data || [];
+                        // console.log(this.visits)
+                    }
+                });
+                // getMoney({
+                //     beginTime: this.dateData[0] + ' 00:00:00' || undefined,
+                //     endTime: this.dateData[1] + ' 23:59:59' || undefined
+                // }).then(res => {
+                //     let self = this;
+                //     if (res.code == 1) {
+                //         this.moneyList = res.data || [];
+                //         console.log(this.moneyList)
+                //         //取出moneyList集合中所有键值对中的值
+                //         this.moneyList.map(function (item) {
+                //             self.money +=  parseInt(item.total_sales);
+                //         });
+                //     }
+                // });
+            },
+            activeIndex(index) {
+                this.nowIndex = index;
+                const today = new Date()
+                const end = today.getTime()
+                let start
+                switch (index) {
+                    case 0: // 昨日
+                        start = end - 24 * 60 * 60 * 1000
+                        break
+                    case 1: // 近7日
+                        start = end - 7 * 24 * 60 * 60 * 1000
+                        break
+                    case 2: // 近30日
+                        start = end - 30 * 24 * 60 * 60 * 1000
+                        break
+                    case 3: // 本周
+                        const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1)
+                        start = weekStart.getTime()
+                        break
+                    case 4: // 本月
+                        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+                        start = monthStart.getTime()
+                        break
+                    default:
+                        break
+                }
+                this.dateData = [this.formatDate(start), this.formatDate(end)];
+                this.init();
+                this.drawLine1();
+                this.drawLine3();
+                this.drawLine4();
+            },
+            formatDate(timestamp) {
+                const date = new Date(timestamp)
+                const year = date.getFullYear()
+                const month = this.padZero(date.getMonth() + 1)
+                const day = this.padZero(date.getDate())
+                return `${year}-${month}-${day}`
+            },
+            padZero(value) {
+                return value < 10 ? `0${value}` : value
+            },
+            drawLine1() {
+                let self = this;
+                // 基于准备好的dom，初始化echarts实例
+                let myChart = echarts.init(document.getElementById('myChart'))
+                getMoney({
+                    beginTime: this.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: this.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    self.moneyDayList = [];
+                    self.moneyList = [];
+                    if (res.code == 1) {
+                        // 定义一个存储返回的销量值对象
+                        let salesData = [];
+                        const currentDate = new Date(this.dateData[0] + ' 00:00:00');
+                        // console.log('currentDate', currentDate)
+                        const endDate = new Date(this.dateData[1] + ' 23:59:59');
+                        while (currentDate <= endDate) {
+                            const options = {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                timeZone: 'Asia/Shanghai'
+                            };
+                            self.moneyDayList.push(currentDate.toLocaleString('zh-CN', options).replace(/\//g, '-'));
+                            // console.log("currentDate.toLocaleString()", currentDate.toLocaleString('zh-CN', options))
+                            // console.log("self.moneyDayList", self.moneyDayList)
+                            currentDate.setDate(currentDate.getDate() + 1);
+                            // console.log("currentDate.toLocaleString()++++++++++++++", currentDate.toLocaleString('zh-CN', options))
+                        }
+                        res.data.map(function (item) {
+                            salesData[item.date] = item.total_sales;
+                            self.money += parseInt(item.total_sales);
+                        });
+                        for (const date of self.moneyDayList) {
+                            const value = salesData[date] || 0;
+                            self.moneyList.push(value);
+                        }
+                        // console.log('self.moneyDayList', self.moneyDayList)
+                        // console.log('self.money', self.money)
+                        // console.log('self.moneyList', self.moneyList)
+                        // console.log('salesData', salesData)
+                        // 将数据渲染成图表
+                        myChart.setOption({
+                            tooltip: {
+                                trigger: 'axis',
+                                formatter: function (params) {
+                                    const date = params[0].axisValue;
+                                    const amount = params[0].data;
+                                    return `日期：${date}<br>销售金额：${amount}元`;
+                                }
+                            },
+                            title: {
+                                text: '销售金额曲线图'
+                            },
+                            xAxis: {
+                                type: 'category',
+                                name: '日期',
+                                data: self.moneyDayList,
+                                splitLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        type: 'dashed'
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                type: 'value',
+                                axisLabel: {
+                                    formatter: '{value} 元'
+                                }
+                            },
+                            series: [{
+                                name: '销售金额',
+                                data: self.moneyList,
+                                type: 'line',
+                                itemStyle: {
+                                    color: 'red' // 设置线条的颜色为红色
+                                }
+                            }]
+                        })
+                    }
+                }).catch(err => console.log(err))
+                window.addEventListener('resize', myChart.resize)
+            },
+            drawLine3() {
+                let self = this;
+
+                // 基于准备好的dom，初始化echarts实例
+                let myChart = echarts.init(document.getElementById('myChart1'));
+                getTop10Sales({
+                    beginTime: self.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: self.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    if (res.code == 1) {
+                        self.top10Data.nameList = [];
+                        self.top10Data.numberList = [];
+                        res.data.map(item => {
+                            self.top10Data.nameList.push(item.targetName);
+                            self.top10Data.numberList.push(item.targetNumber);
+                        })
+                        console.log(self.top10Data.nameList)
+                        console.log(self.top10Data.numberList)
+                        // 绘制图表
+                        myChart.setOption({
+                            title: {
+                                text: '销量前十商品',
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                backgroundColor: '#fff', //背景颜色（此时为默认色）
+                                borderRadius: 2, //边框圆角
+                                textStyle: {
+                                    color: '#333', //字体颜色
+                                    fontSize: 12, //字体大小
+                                    fontWeight: 300,
+                                },
+                            },
+                            grid: {
+                                top: '10px',
+                                left: '0',
+                                right: '0',
+                                bottom: '0',
+                                containLabel: true,
+                            },
+                            xAxis: {
+                                show: false,
+                            },
+                            yAxis: {
+                                //   隐藏y轴坐标轴
+                                axisLine: {
+                                    show: false,
+                                },
+                                // 隐藏y轴刻度线
+                                axisTick: {
+                                    show: false,
+                                    alignWithLabel: true,
+                                },
+                                type: 'category',
+                                // interval: 100,
+                                axisLabel: {
+                                    textStyle: {
+                                        color: '#666',
+                                        fontSize: '12px',
+                                    },
+                                    // formatter: "{value} ml",//单位
+                                },
+                                data: this.top10Data.nameList,
+                            },
+                            series: [
+                                {
+                                    data: this.top10Data.numberList,
+                                    type: 'bar',
+                                    showBackground: true,
+                                    backgroundStyle: {
+                                        color: '#F3F4F7',
+                                    },
+                                    barWidth: 20,
+                                    barGap: '80%' /*多个并排柱子设置柱子之间的间距*/,
+                                    barCategoryGap: '80%' /*多个并排柱子设置柱子之间的间距*/,
+
+                                    itemStyle: {
+                                        emphasis: {
+                                            barBorderRadius: 30,
+                                        },
+                                        normal: {
+                                            barBorderRadius: [0, 10, 10, 0], // 圆角
+                                            color: new echarts.graphic.LinearGradient( // 渐变色
+                                                1,
+                                                0,
+                                                0,
+                                                0, // 渐变色的起止位置, 右/下/左/上
+                                                [
+                                                    // offset 位置
+                                                    {offset: 0, color: '#FFBD00'},
+                                                    {offset: 1, color: '#FFD000'},
+                                                ]
+                                            ),
+                                            label: {
+                                                //内容样式
+                                                show: true,
+                                                formatter: '{@score}',
+                                                color: '#333',
+                                                // position: "insideLeft", //内部左对齐
+                                                position: ['8', '5'], //自定义位置第一个参数为x轴方向，第二个参数为y轴方向，左上角为起点，向右向下为正数，向上向左为负数
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        });
+                    }
+                }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                });
+
+                window.addEventListener('resize', myChart.resize)
+
+            },
+            drawLine4() {
+                let self = this;
+                self.registerList = [];
+                self.registerDayList = [];
+                self.allRegisterList = [];
+                getRegisterUsers({
+                    beginTime: self.dateData[0] + ' 00:00:00' || undefined,
+                    endTime: self.dateData[1] + ' 23:59:59' || undefined
+                }).then(res => {
+                    if (res.code == 1) {
+                        let registerData = [];
+                        const currentDate = new Date(self.dateData[0] + ' 00:00:00');
+                        const endDate = new Date(self.dateData[1] + ' 23:59:59');
+                        while (currentDate <= endDate) {
+                            const options = {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                timeZone: 'Asia/Shanghai'
+                            };
+                            self.registerDayList.push(currentDate.toLocaleString('zh-CN', options).replace(/\//g, '-'));
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+                        res.data.map(function (item) {
+                            registerData[item.date] = item.count;
+                        });
+                        for (const date of self.registerDayList) {
+                            const value = registerData[date] || 0;
+                            self.registerList.push(value);
+                        }
+                        getUsers({
+                            beginTime: self.dateData[0] + ' 00:00:00' || undefined,
+                            endTime: self.dateData[1] + ' 23:59:59' || undefined
+                        }).then(res => {
+                            if (res.code == 1) {
+                                self.allRegisterList = res.data || [];
+                                // 基于准备好的dom，初始化echarts实例
+                                let myChart = echarts.init(document.getElementById('main1'));
+                                // 绘制图表
+                                myChart.setOption({
+                                    title: {
+                                        text: '用户注册量',
+                                    },
+                                    tooltip: {
+                                        trigger: 'axis'
+                                    },
+                                    legend: {
+                                        data: ['累积用户', '新增用户']
+                                    },
+                                    axisLabel: {
+                                        interval: 0
+                                    },
+                                    axisTick: {
+                                        interval: 0
+                                    },
+                                    xAxis: {
+                                        type: 'category',
+                                        name: '日期',
+                                        data: self.registerDayList,
+                                        axisLabel: {
+                                            interval: 'auto' // 让 ECharts 自动计算最佳的显示间隔
+                                        },
+                                        axisTick: {
+                                            interval: 0 // 每个刻度线都显示
+                                        }
+                                    },
+                                    yAxis: {
+                                        type: 'value',
+                                    },
+                                    series: [
+                                        {
+                                            name: '累积用户',
+                                            type: 'line',
+                                            stack: 'Total',
+                                            data: self.allRegisterList,
+                                        },
+                                        {
+                                            name: '新增用户',
+                                            type: 'line',
+                                            stack: 'Total',
+                                            data: self.registerList,
+                                        }
+                                    ]
+                                });
+                                window.addEventListener('resize', myChart.resize)
+                            }
+                        });
+
+                    }
+                })
+                console.log('registerDayList', self.registerDayList);
+                console.log('moneyDayList', self.moneyDayList);
+                console.log('registerList', self.registerList);
+                console.log('allRegisterList', self.allRegisterList);
+
+
+            }
+        }
+    });
+</script>
+<style>
+    body {
+        background-color: #ececec;
+        height: 100vh;
+    }
+
+
+    /* 定义卡片容器的样式 */
+    .card-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        margin: 1rem 0;
+        overflow-x: scroll;
+    }
+
+    /* 定义卡片的样式 */
+    .card {
+        width: 20rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+        overflow: hidden;
+    }
+
+    /* 定义卡片标题的样式 */
+    .card-header {
+        background-color: #f5f5f5;
+        padding: .8rem;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* 定义卡片内容的样式 */
+    .card-body {
+        padding: 1rem;
+    }
+
+    .chart-container {
+        height: 100vh;
+    }
+
+    .chart-container div {
+        display: inline-block;
+        width: 50%;
+        height: 50%;
+    }
+</style>
