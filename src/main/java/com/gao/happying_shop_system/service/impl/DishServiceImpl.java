@@ -3,6 +3,7 @@ package com.gao.happying_shop_system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gao.happying_shop_system.service.IProductSalesService;
 import com.gao.happying_shop_system.utils.R;
 import com.gao.happying_shop_system.dto.DishDto;
 import com.gao.happying_shop_system.entity.Category;
@@ -38,6 +39,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
     private DishMapper dishMapper;
     @Autowired
     private ICategoryService categoryService;
+
+    @Autowired
+    private IProductSalesService productSalesService;
     /**
      * @Description: 新增菜品，同时保存对应的口味数据
      * @Param: [dishDto]
@@ -149,7 +153,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
         dishLambdaQueryWrapper.eq(dish.getCategoryId() != null,Dish::getCategoryId,dish.getCategoryId());
         //查找状态为1的商品
         dishLambdaQueryWrapper.eq(Dish::getStatus,1);
-        dishLambdaQueryWrapper.orderByDesc(Dish::getUpdateTime).orderByAsc(Dish::getSort);
+//        dishLambdaQueryWrapper.orderByDesc(Dish::getUpdateTime).orderByAsc(Dish::getSort);
         List<Dish> dishes = this.list(dishLambdaQueryWrapper);
 
         List<DishDto> dishDtos = dishes.stream().map(dishItem -> {
@@ -158,6 +162,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements ID
             BeanUtils.copyProperties(dishItem, dishDto);
             //根据分类id查找口味
             Long dishId = dishItem.getId();
+
+            Integer saleNum = productSalesService.getSalesNumber(dishId.toString());
+            dishDto.setSaleNum(saleNum);
+
             LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
             dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId,dishId);
             List<DishFlavor> dishFlavors = dishFlavorService.list(dishFlavorLambdaQueryWrapper);

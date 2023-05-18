@@ -1,5 +1,6 @@
 package com.gao.happying_shop_system.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.gao.happying_shop_system.entity.Dish;
 import com.gao.happying_shop_system.entity.DishFlavor;
 import lombok.Data;
@@ -20,4 +21,7 @@ public class DishDto extends Dish {
     private String categoryName;
 
     private Integer copies;
+
+    @TableField(exist = false)
+    private Integer saleNum;
 }

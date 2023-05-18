@@ -5,15 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>开心商铺管理端</title>
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" href="./images/favico.ico">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="plugins/element-ui/index.css" />
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/index.css" />
     <link rel="stylesheet" href="styles/icon/iconfont.css" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/c/font_3450690_gmp2l54hweq.css" />
     <style>
-      .body{
+      body{
+        height: 100%;
         min-width: 1366px;
+      }
+      #app {
+        height: 100%;
       }
       .app-main{
         height: calc(100% - 64px);
@@ -32,7 +37,8 @@
         <div class="sidebar-container">
           <div class="logo">
             <!-- <img src="images/logo.png" width="122.5" alt="" /> -->
-            <img src="images/login/login-logo.png" alt="" style="width: 117px; height: 32px" />
+            <img src="./images/favico.ico" alt="" style="width: auto; height: 32px" />
+            <span style="color: white;font-size: 20px;">开心商铺</span>
           </div>
 
           <el-scrollbar wrap-class="scrollbar-wrapper">
@@ -114,14 +120,10 @@
         el: '#app',
         data() {
           return {
-            defAct: '2',
-            menuActived: '2',
+            defAct: '7',
+            menuActived: '7',
             userInfo: {},
             menuList: [
-              // {
-              //   id: '1',
-              //   name: '门店管理',
-              //   children: [
                   {
                     id: '2',
                     name: '员工管理',
@@ -151,12 +153,18 @@
                     name: '订单明细',
                     url: 'page/order/list.html',
                     icon: 'icon-order'
+                  },
+                  {
+                    id: '7',
+                    name: '数据统计',
+                    url: 'page/report/report.html',
+                    icon: 'icon-baobiao'
                   }
               //   ],
               // },
             ],
-            iframeUrl: 'page/member/list.html',
-            headTitle: '员工管理',
+            iframeUrl: 'page/report/report.html',
+            headTitle: '数据统计',
             goBackFlag: false,
             loading: true,
             timer: null

@@ -1,5 +1,7 @@
 package com.gao.happying_shop_system.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -21,8 +23,7 @@ public class User implements Serializable {
     //姓名
     private String name;
 
-
-    //手机号
+    //邮箱号
     private String email;
 
     //密码
@@ -43,4 +44,11 @@ public class User implements Serializable {
 
     //状态 0:禁用，1:正常
     private Integer status;
+
+    //创建时间
+    private LocalDateTime CreateTime;
+
+    //验证码
+    @TableField(exist = false)
+    private String code;
 }

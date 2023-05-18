@@ -1,8 +1,9 @@
-package com.gao.happying_shop_system.service;
+package com.gao.happying_shop_system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gao.happying_shop_system.entity.OrderDetail;
 import com.gao.happying_shop_system.mapper.OrderDetailMapper;
+import com.gao.happying_shop_system.service.IOrderDetailService;
 import org.springframework.stereotype.Service;
 
 /**

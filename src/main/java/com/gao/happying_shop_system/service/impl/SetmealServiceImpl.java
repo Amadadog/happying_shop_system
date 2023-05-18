@@ -3,12 +3,12 @@ package com.gao.happying_shop_system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gao.happying_shop_system.dto.DishDto;
+import com.gao.happying_shop_system.entity.*;
+import com.gao.happying_shop_system.service.IProductSalesService;
 import com.gao.happying_shop_system.utils.R;
 import com.gao.happying_shop_system.utils.ServiceException;
 import com.gao.happying_shop_system.dto.SetmealDto;
-import com.gao.happying_shop_system.entity.Category;
-import com.gao.happying_shop_system.entity.Setmeal;
-import com.gao.happying_shop_system.entity.SetmealDish;
 import com.gao.happying_shop_system.mapper.SetmealMapper;
 import com.gao.happying_shop_system.service.ICategoryService;
 import com.gao.happying_shop_system.service.ISetmealDishService;
@@ -37,6 +37,9 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     @Autowired
     private ICategoryService categoryService;
+
+    @Autowired
+    private IProductSalesService productSalesService;
 
     @Override
     @Transactional()
@@ -137,5 +140,31 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         setmealDishService.remove(setmealDishLambdaQueryWrapper);
+
+        //删除套餐销售情况表
+        LambdaQueryWrapper<ProductSales> productSalesLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        productSalesLambdaQueryWrapper.in(ProductSales::getSetmealId,ids);
+        productSalesService.remove(productSalesLambdaQueryWrapper);
+    }
+
+    @Override
+    public R<List<Setmeal>> list(Setmeal setmeal) {
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,1);
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        List<Setmeal> setmeals = this.list(queryWrapper);
+        List<Setmeal> setmealList = setmeals.stream().map(setmealItem -> {
+            //基本属性传递
+            Setmeal setmeal1 = new Setmeal();
+            BeanUtils.copyProperties(setmealItem, setmeal1);
+            //根据分类id查找口味
+            Long setmealItemId = setmealItem.getId();
+
+            Integer saleNum = productSalesService.getSalesNumber(setmealItemId.toString());
+            setmeal1.setSaleNum(saleNum);
+            return setmeal1;
+        }).collect(Collectors.toList());
+        return R.success(setmealList);
     }
 }

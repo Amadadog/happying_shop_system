@@ -6,6 +6,7 @@ import com.gao.happying_shop_system.dto.DishDto;
 import com.gao.happying_shop_system.entity.Dish;
 import com.gao.happying_shop_system.entity.SetmealDish;
 import com.gao.happying_shop_system.service.IDishService;
+import com.gao.happying_shop_system.service.IProductSalesService;
 import com.gao.happying_shop_system.utils.R;
 import com.gao.happying_shop_system.dto.SetmealDto;
 import com.gao.happying_shop_system.entity.Setmeal;
@@ -39,6 +40,8 @@ public class SetmealController {
 
     @Autowired
     private IDishService dishService;
+    @Autowired
+    private IProductSalesService productSalesService;
 
     /**
      * @description: 新增套餐
@@ -92,12 +95,7 @@ public class SetmealController {
 
     @GetMapping("/list")
     public R<List<Setmeal>> list(Setmeal setmeal){
-        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
-        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,1);
-        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
-        List<Setmeal> list = setmealService.list(queryWrapper);
-        return R.success(list);
+        return setmealService.list(setmeal);
     }
     @GetMapping("/dish/{id}")
     public R<List<DishDto>> dish(@PathVariable("id") Long SetmealId){

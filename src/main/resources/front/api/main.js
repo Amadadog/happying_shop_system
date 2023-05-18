@@ -66,5 +66,11 @@ function setMealDishDetailsApi(id) {
         'method': 'get',
     })
 }
-
+//根据邮箱获取用户信息
+function getUserInfoApi(email) {
+    return $axios({
+        'url': `/user/getUserByEmail/${email}`,
+        'method': 'get',
+    })
+}
 

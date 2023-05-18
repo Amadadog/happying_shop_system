@@ -43,12 +43,14 @@ public class LoginCheckFilter implements Filter {
                 "/universal/**",
                 "/user/sendMailCode",
                 "/user/loginByCode",
+                "/user/register",
                 "/user/loginByUser",
                 "/swagger-ui/**",
                 "/swagger-resources/**",
                 "/v3/**",
                 "/v2/**",
-                "/happying_shop_system/dish/**"
+                "/happying_shop_system/dish/**",
+
         };
 
         //2.判断此次请求是否需要处理

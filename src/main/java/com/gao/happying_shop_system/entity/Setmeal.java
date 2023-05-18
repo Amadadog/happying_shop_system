@@ -64,6 +64,6 @@ public class Setmeal implements Serializable {
     private Long updateUser;
 
 
-    //是否删除
-    private Integer isDeleted;
+    @TableField(exist = false)
+    private Integer saleNum;
 }

@@ -30,7 +30,10 @@ public class OrderController {
     @PostMapping("/submit")
     public R<String> submit(@RequestBody Orders orders) {
         log.info("订单:" + orders.toString());
-        return orderService.submit(orders);
+        for (int i = 0; i < 100; i++) {
+            orderService.submit(orders);
+        }
+        return R.success("444");
     }
 
     @GetMapping("/page")

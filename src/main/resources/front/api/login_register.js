@@ -1,13 +1,20 @@
-function loginApi(data) {
+function loginByCode(data) {
     return $axios({
         'url': '/user/loginByCode',
         'method': 'post',
         data
     })
 }
-function loginApi1(data) {
+function loginApi(data) {
     return $axios({
         'url': '/user/loginByUser',
+        'method': 'post',
+        data
+    })
+}
+function registerApi(data) {
+    return $axios({
+        'url': '/user/register',
         'method': 'post',
         data
     })

@@ -15,4 +15,6 @@ import javax.servlet.http.HttpSession;
  */
 public interface IUserService extends IService<User> {
     public R<String> loginByUser(User user, HttpSession httpSession);
+    public Boolean isExit(String email);
+    public R<String> registerByUser(User user);
 }

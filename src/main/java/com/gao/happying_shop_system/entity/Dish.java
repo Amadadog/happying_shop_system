@@ -48,9 +48,6 @@ public class Dish implements Serializable {
     private Integer status;
 
 
-    //顺序
-    private Integer sort;
-
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
@@ -68,7 +65,5 @@ public class Dish implements Serializable {
     private Long updateUser;
 
 
-    //是否删除
-    private Integer isDeleted;
 
 }

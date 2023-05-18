@@ -14,6 +14,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -71,7 +72,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Override
     public R<String> save(HttpServletRequest request, Employee employee) {
         //设置默认密码123456，md5加密
-//        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 //        employee.setCreateTime(LocalDateTime.now());
 //        employee.setUpdateTime(LocalDateTime.now());
 //        Long empId = (Long) request.getSession().getAttribute("employeeId");

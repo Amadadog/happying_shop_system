@@ -33,4 +33,6 @@ public interface ISetmealService extends IService<Setmeal> {
     public SetmealDto getByIdWithSetmealAndDish(Long id);
 
     public void delete(@RequestParam List<Long> ids);
+
+    public R<List<Setmeal>> list(Setmeal setmeal);
 }
