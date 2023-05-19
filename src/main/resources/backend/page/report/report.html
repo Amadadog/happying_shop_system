@@ -44,7 +44,6 @@
                     已选时间：{{ dateData[0] }} 至 {{ dateData[1] }}
                 </p>
             </div>
-            <el-button type="primary" @click="open1">导出数据<i class="iconfont icon-daochu"></i></el-button>
 
         </div>
     </div>
@@ -352,7 +351,7 @@
                                 },
                             },
                             grid: {
-                                top: '10px',
+                                top: '10%',
                                 left: '0',
                                 right: '0',
                                 bottom: '0',
@@ -380,11 +379,11 @@
                                     },
                                     // formatter: "{value} ml",//单位
                                 },
-                                data: this.top10Data.nameList,
+                                data: this.top10Data.nameList.reverse(),
                             },
                             series: [
                                 {
-                                    data: this.top10Data.numberList,
+                                    data: this.top10Data.numberList.reverse(),
                                     type: 'bar',
                                     showBackground: true,
                                     backgroundStyle: {
@@ -435,6 +434,7 @@
             drawLine4() {
                 let self = this;
                 self.registerList = [];
+                self.users = 0;
                 self.registerDayList = [];
                 self.allRegisterList = [];
                 getRegisterUsers({
@@ -457,9 +457,12 @@
                         }
                         res.data.map(function (item) {
                             registerData[item.date] = item.count;
+                            if (item.count != 0) {
+                                self.users += Number(item.count);
+                            }
                         });
                         for (const date of self.registerDayList) {
-                            const value = registerData[date] || 0;
+                            const value = Number(registerData[date]) || 0;
                             self.registerList.push(value);
                         }
                         getUsers({
@@ -468,6 +471,8 @@
                         }).then(res => {
                             if (res.code == 1) {
                                 self.allRegisterList = res.data || [];
+                                console.log('999999',self.allRegisterList);
+                                console.log('11111',res.data);
                                 // 基于准备好的dom，初始化echarts实例
                                 let myChart = echarts.init(document.getElementById('main1'));
                                 // 绘制图表
@@ -481,22 +486,22 @@
                                     legend: {
                                         data: ['累积用户', '新增用户']
                                     },
-                                    axisLabel: {
-                                        interval: 0
-                                    },
-                                    axisTick: {
-                                        interval: 0
-                                    },
+                                    // axisLabel: {
+                                    //     interval: 0
+                                    // },
+                                    // axisTick: {
+                                    //     interval: 1
+                                    // },
                                     xAxis: {
                                         type: 'category',
                                         name: '日期',
                                         data: self.registerDayList,
-                                        axisLabel: {
-                                            interval: 'auto' // 让 ECharts 自动计算最佳的显示间隔
-                                        },
-                                        axisTick: {
-                                            interval: 0 // 每个刻度线都显示
-                                        }
+                                        // axisLabel: {
+                                        //     interval: 'auto' // 让 ECharts 自动计算最佳的显示间隔
+                                        // },
+                                        // axisTick: {
+                                        //     interval: 0 // 每个刻度线都显示
+                                        // }
                                     },
                                     yAxis: {
                                         type: 'value',
@@ -505,13 +510,11 @@
                                         {
                                             name: '累积用户',
                                             type: 'line',
-                                            stack: 'Total',
                                             data: self.allRegisterList,
                                         },
                                         {
                                             name: '新增用户',
                                             type: 'line',
-                                            stack: 'Total',
                                             data: self.registerList,
                                         }
                                     ]

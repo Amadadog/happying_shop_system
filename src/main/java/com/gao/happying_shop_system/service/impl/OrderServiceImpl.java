@@ -81,18 +81,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             ProductSales productSales = new ProductSales();
             // 当前遍历的购物车商品如果是dish
             if (shoppingCart.getDishId() != null) {
-//                // 构建查询条件
-//                LambdaQueryWrapper<ProductSales> wrapper = new LambdaQueryWrapper<>();
-//                wrapper.eq(ProductSales::getDishId, shoppingCart.getDishId());
-//
-//                // 执行查询
-//                ProductSales productSales1 = productSalesService.getOne(wrapper);
-//                //如果该商品在表中已经存在
-//                if (productSales1 != null) {
-//                    productSales.setId(productSales1.getId());
-//                    productSales.setDishNumber(shoppingCart.getNumber() + productSales1.getDishNumber());
-//                    productSales.setAllSalesAmount((shoppingCart.getAmount().multiply(new BigDecimal(shoppingCart.getNumber()))).add(productSales1.getAllSalesAmount()));
-//                } else {
                 productSales.setDishId(shoppingCart.getDishId());
                 productSales.setDishNumber(shoppingCart.getNumber());
 //                productSales.setCreateTime(LocalDateTime.of(2023, 4, 3, 13, 29, 10));
@@ -101,18 +89,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
             }
             // 当前遍历的购物车商品如果是setmeal
             if (shoppingCart.getSetmealId() != null) {
-//                // 构建查询条件
-//                LambdaQueryWrapper<ProductSales> wrapper = new LambdaQueryWrapper<>();
-//                wrapper.eq(ProductSales::getSetmealId, shoppingCart.getSetmealId());
-//
-//                // 执行查询
-//                ProductSales productSales1 = productSalesService.getOne(wrapper);
-//                //如果该套餐在表中已经存在
-//                if (productSales1 != null) {
-//                    productSales.setId(productSales1.getId());
-//                    productSales.setSetmealNumber(shoppingCart.getNumber() + productSales1.getDishNumber());
-//                    productSales.setAllSalesAmount((shoppingCart.getAmount().multiply(new BigDecimal(shoppingCart.getNumber()))).add(productSales1.getAllSalesAmount()));
-//                } else {
                 productSales.setSetmealId(shoppingCart.getSetmealId());
                 productSales.setSetmealNumber(shoppingCart.getNumber());
 //                productSales.setCreateTime(LocalDateTime.of(2023, 4, 3, 13, 29, 10));
